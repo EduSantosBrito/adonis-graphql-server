@@ -8,22 +8,51 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, graphiqlAdonis, graphqlAdonis }) {
+    constructor({ Config, runHttpQuery, GraphiQL }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
-        this.graphiqlAdonis = graphiqlAdonis;
-        this.graphqlAdonis = graphqlAdonis;
+        this.runHttpQuery = runHttpQuery;
+        this.GraphiQL = GraphiQL;
     }
 
-    handle(context) {
-        return this.graphqlAdonis({
-            context,
-            schema: this.$schema,
-        })(context);
+    async graphql(options, request, response) {
+        if (!options) {
+            throw new Error('Apollo Server requires options.');
+        }
+
+        try {
+            const gqlResponse = await this.runHttpQuery([request], {
+                method: request.method(),
+                options,
+                query: request.method() === 'POST' ? request.post() : request.get(),
+            });
+            return response.json(gqlResponse);
+        } catch (error) {
+            if (error.name !== 'HttpQueryError') {
+                throw error;
+            }
+            if (error.headers) {
+                Object.keys(error.headers).forEach(header => {
+                    response.header(header, error.headers[header]);
+                });
+            }
+            return response.statusCode(error.statusCode).send(error.message);
+        }
     }
 
-    handleUi(context) {
-        return this.graphiqlAdonis({ endpointURL: '/' })(context);
+    async graphiql(options, request, response) {
+        if (!options) {
+            throw new Error('Apollo Server GraphiQL requires options.');
+        }
+
+        const query = request.originalUrl();
+
+        try {
+            const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
+            return response.header('Content-Type', 'text/html').send(graphiqlString);
+        } catch (error) {
+            return response.send(error);
+        }
     }
 }
 
