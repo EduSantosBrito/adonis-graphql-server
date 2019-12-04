@@ -3,8 +3,6 @@ const { renderPlaygroundPage } = require('@apollographql/graphql-playground-html
 const { ApolloServerBase } = require('apollo-server-core');
 const { graphqlAdonis } = require('./AdonisApollo');
 
-export { GraphQLExtension, GraphQLOptions } from 'apollo-server-core';
-
 class ApolloServer extends ApolloServerBase {
     constructor() {
         super();
