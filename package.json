@@ -1,0 +1,52 @@
+{
+    "name": "adonis-graphql-server",
+    "version": "0.1.0",
+    "description": "AdonisJS Provider to use GraphQL",
+    "main": "index.js",
+    "scripts": {},
+    "husky": {
+        "hooks": {
+            "pre-commit": "eslint --fix . --ext .js .",
+            "pre-push": "eslint --fix . --ext .js ."
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/EduSantosBrito/adonis-graphql-server.git"
+    },
+    "keywords": [
+        "adonis",
+        "adonisJS",
+        "graphql",
+        "apollo"
+    ],
+    "author": "Eduardo Santos de Brito",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/EduSantosBrito/adonis-graphql-server/issues"
+    },
+    "homepage": "https://github.com/EduSantosBrito/adonis-graphql-server#readme",
+    "devDependencies": {
+        "@adonisjs/fold": "^4.0.9",
+        "@adonisjs/framework": "^5.0.9",
+        "@apollographql/graphql-playground-html": "^1.6.24",
+        "apollo-server": "^2.9.12",
+        "apollo-server-core": "^2.9.12",
+        "eslint": "^6.1.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-config-prettier": "^6.5.0",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-prettier": "^3.1.1",
+        "graphql": "^14.5.8",
+        "husky": "^3.0.9",
+        "prettier": "^1.19.1"
+    },
+    "peerDependencies": {
+        "@adonisjs/fold": "^4.0.9",
+        "@adonisjs/framework": "^5.0.9",
+        "@apollographql/graphql-playground-html": "^1.6.24",
+        "apollo-server": "^2.9.12",
+        "apollo-server-core": "^2.9.12",
+        "graphql": "^14.5.8"
+    }
+}
