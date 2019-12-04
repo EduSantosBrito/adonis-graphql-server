@@ -1,7 +1,7 @@
 const { ServiceProvider } = require('@adonisjs/fold');
 const { graphqlAdonis, graphiqlAdonis } = require('../src/AdonisGraphQLServer/ApolloServer');
 
-class AdonisMongodbProvider extends ServiceProvider {
+class AdonisGraphQLServerProvider extends ServiceProvider {
     register() {
         this.app.singleton('GraphQLServer', () => {
             const Config = this.app.use('Adonis/Src/Config');
@@ -10,4 +10,4 @@ class AdonisMongodbProvider extends ServiceProvider {
     }
 }
 
-module.exports = AdonisMongodbProvider;
+module.exports = AdonisGraphQLServerProvider;
