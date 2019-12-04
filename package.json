@@ -1,6 +1,6 @@
 {
     "name": "adonis-graphql-server",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "AdonisJS Provider to use GraphQL",
     "main": "index.js",
     "scripts": {},
