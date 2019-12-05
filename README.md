@@ -1,4 +1,7 @@
 <h1 align="center">Welcome to adonis-graphql-server 👋</h1>
+
+<h1>PLEASE DON'T USE THIS PACKAGE YET. IT'S WORKING IN PROGRESS</h1>
+
 <p>
   <a href="https://www.npmjs.com/package/adonis-graphql-server" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/adonis-graphql-server.svg">
