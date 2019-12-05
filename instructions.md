@@ -78,7 +78,10 @@ module.exports = {
         }
         // you can change context with everything you want
   }),
-  endpoint: "/graphql" // default is already /graphql, but if you want to change graphql endpoint, change this to make graphiql work
+  endpoint: "/graphql", // default is already /graphql, but if you want to change graphql endpoint, change this to make graphiql work
+  formatError: err => {
+    return err.message;
+  }
 };
 
 ```
