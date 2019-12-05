@@ -8,34 +8,20 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL, qs }) {
+    constructor({ Config, runHttpQuery, GraphiQL, jsonBody }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
-        this.qs = qs;
-    }
-
-    async getBodyData(request) {
-        if (request.method === 'POST') {
-            let body = '';
-
-            request.on('data', data => {
-                body += data;
-            });
-
-            request.on('end', () => {
-                const post = this.qs.parse(body);
-                console.log(post);
-            });
-        }
+        this.jsonBody = jsonBody;
     }
 
     async graphql({ req, res }) {
         if (!this.options) {
             throw new Error('Apollo Server requires options.');
         }
-        await this.getBodyData();
+        const body = await this.jsonBody(req, res);
+        console.log(body);
         try {
             const gqlResponse = await this.runHttpQuery([req], {
                 method: req.method,
