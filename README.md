@@ -1,7 +1,5 @@
 <h1 align="center">Welcome to adonis-graphql-server 👋</h1>
 
-<h1>PLEASE DON'T USE THIS PACKAGE YET. IT'S WORKING IN PROGRESS</h1>
-
 <p>
   <a href="https://www.npmjs.com/package/adonis-graphql-server" target="_blank">
     <img alt="Version" src="https://img.shields.io/npm/v/adonis-graphql-server.svg">
@@ -38,8 +36,8 @@ See in [instructions.md](https://github.com/EduSantosBrito/adonis-graphql-server
 
 👤 **Eduardo Santos de Brito**
 
-* Twitter: [@edusantosbrito](https://twitter.com/edusantosbrito)
-* Github: [@EduSantosBrito](https://github.com/EduSantosBrito)
+-   Twitter: [@edusantosbrito](https://twitter.com/edusantosbrito)
+-   Github: [@EduSantosBrito](https://github.com/EduSantosBrito)
 
 ## 🤝 Contributing
 
@@ -54,5 +52,6 @@ Give a ⭐️ if this project helped you!
 Copyright © 2019 [Eduardo Santos de Brito](https://github.com/EduSantosBrito).<br />
 This project is [MIT](https://github.com/EduSantosBrito/adonis-graphql-server/blob/master/LICENSE) licensed.
 
-***
+---
+
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_

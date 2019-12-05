@@ -17,16 +17,18 @@ class AdonisGraphQLServer {
     }
 
     async graphql({ request, response }) {
-        if (!this.options) {
+        const { typeDefs, resolvers, ...options } = this.options;
+        if (!this.options || !typeDefs || !resolvers) {
             throw new Error('Apollo Server requires options.');
         }
         try {
-            const gqlResponse = await this.runHttpQuery([request], {
+            const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),
-                options: { schema: this.makeExecutableSchema(this.options) },
+                options: { schema: this.makeExecutableSchema({ typeDefs, resolvers }), ...options },
                 query: request.method() === 'POST' ? request.post() : request.get(),
             });
-            return response.json(gqlResponse);
+            response.safeHeader('Content-type', 'application/json');
+            return response.json(graphqlResponse);
         } catch (error) {
             if (error.name !== 'HttpQueryError') {
                 throw error;
@@ -40,20 +42,20 @@ class AdonisGraphQLServer {
         }
     }
 
-    // async graphiql(options, request, response) {
-    //     if (!options) {
-    //         throw new Error('Apollo Server GraphiQL requires options.');
-    //     }
+    async graphiql(options, request, response) {
+        if (!options) {
+            throw new Error('Apollo Server GraphiQL requires options.');
+        }
 
-    //     const query = request.originalUrl();
+        const query = request.originalUrl();
 
-    //     try {
-    //         const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
-    //         return response.header('Content-Type', 'text/html').send(graphiqlString);
-    //     } catch (error) {
-    //         return response.send(error);
-    //     }
-    // }
+        try {
+            const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
+            return response.header('Content-Type', 'text/html').send(graphiqlString);
+        } catch (error) {
+            return response.send(error);
+        }
+    }
 }
 
 module.exports = AdonisGraphQLServer;
