@@ -7,8 +7,9 @@ class AdonisGraphQLServerProvider extends ServiceProvider {
             const { runHttpQuery } = this.app.use('apollo-server-core');
             const GraphiQL = this.app.use('graphql-playground-html');
             const { makeExecutableSchema } = require('graphql-tools');
+            const { print } = require('graphql/language/printer');
 
-            return new (require('../src/AdonisGraphQLServer'))({ Config, runHttpQuery, GraphiQL, makeExecutableSchema });
+            return new (require('../src/AdonisGraphQLServer'))({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print });
         });
     }
 }

@@ -8,12 +8,13 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema }) {
+    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
         this.makeExecutableSchema = makeExecutableSchema;
+        this.print = print;
     }
 
     async graphql({ request, response }) {
@@ -21,6 +22,7 @@ class AdonisGraphQLServer {
         if (!this.options || !typeDefs || !resolvers) {
             throw new Error('Apollo Server requires options.');
         }
+        const { query, variables } = request.method() === 'POST' ? request.post() : request.get();
         try {
             const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),
@@ -29,7 +31,7 @@ class AdonisGraphQLServer {
                     context: typeof context === 'function' ? context(request) : context,
                     ...options,
                 },
-                query: request.method() === 'POST' ? request.post() : request.get(),
+                query: variables ? { query: this.print(query), variables } : { query },
             });
             response.safeHeader('Content-type', 'application/json');
             return response.json(graphqlResponse);
