@@ -13,13 +13,14 @@ the config automatic create to `config/graphql.js` file
 ```js
 module.exports = {
     typeDefs: {},
-    resolvers: {}
+    resolvers: {},
 };
 ```
 
 ## Usage
 
 We need to create typeDefs and resolvers to use this provider, this is an example of config file:
+
 ```js
 // config/graphql.js
 
@@ -67,6 +68,17 @@ const resolvers = {
 module.exports = {
   typeDefs,
   resolvers
+  context: (request) => ({
+        auth: {
+            check() => {
+                // can check if user is authenticated
+            },
+            logout() => {},
+            refreshToken() => {},
+        }
+        // you can change context with everything you want
+  }),
+  endpoint: "/graphql" // default is already /graphql, but if you want to change graphql endpoint, change this to make graphiql work
 };
 
 ```
@@ -76,7 +88,7 @@ Now we need to configure routes
 ```js
 // start/routes.js
 
-"use strict";
+'use strict';
 
 /*
 |--------------------------------------------------------------------------
@@ -92,15 +104,18 @@ Now we need to configure routes
 */
 
 /** @type {typeof import('@adonisjs/framework/src/Route/Manager')} */
-const Route = use("Route");
+const Route = use('Route');
 
 /** @type {import('adonis-graphql-server/src/AdonisGraphQLServer')} */
-const GraphQL = use("GraphQLServer");
+const GraphQL = use('GraphQLServer');
 
-Route.post("/graphql", context => {
-  return GraphQL.graphql(context);
+Route.post('/graphql', context => {
+    return GraphQL.graphql(context);
 });
 
+Route.get('/graphiql', context => {
+    return GraphQL.graphiql(context);
+});
 ```
 
 And **that's it**! Now you're free to use GraphQL Server.
