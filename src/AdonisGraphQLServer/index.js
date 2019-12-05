@@ -8,11 +8,12 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL }) {
+    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
+        this.makeExecutableSchema = makeExecutableSchema;
     }
 
     async graphql({ request, response }) {
@@ -22,7 +23,7 @@ class AdonisGraphQLServer {
         try {
             const gqlResponse = await this.runHttpQuery([request], {
                 method: request.method(),
-                options: this.options,
+                options: { schema: this.makeExecutableSchema(this.options) },
                 query: request.method() === 'POST' ? request.post() : request.get(),
             });
             return response.json(gqlResponse);
