@@ -35,7 +35,7 @@ class AdonisGraphQLServer {
                     response.header(header, error.headers[header]);
                 });
             }
-            return response.statusCode(error.statusCode).send(error.message);
+            return response.status(error.statusCode).send(error.message);
         }
     }
 
