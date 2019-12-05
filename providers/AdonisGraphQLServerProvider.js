@@ -6,8 +6,9 @@ class AdonisGraphQLServerProvider extends ServiceProvider {
             const Config = this.app.use('Adonis/Src/Config');
             const { runHttpQuery } = this.app.use('apollo-server-core');
             const GraphiQL = this.app.use('apollo-server-module-graphiql');
+            const qs = this.app.use('querystring');
 
-            return new (require('../src/AdonisGraphQLServer'))({ Config, runHttpQuery, GraphiQL });
+            return new (require('../src/AdonisGraphQLServer'))({ Config, runHttpQuery, GraphiQL, qs });
         });
     }
 }

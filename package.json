@@ -39,9 +39,12 @@
     },
     "peerDependencies": {
         "@adonisjs/fold": "^4.0.9",
-        "@adonisjs/framework": "^5.0.9",
-        "apollo-server-core": "^2.9.12",
+        "@adonisjs/framework": "^5.0.9"
+    },
+    "dependencies": {
+        "querystring": "^0.2.0",
         "apollo-server-module-graphiql": "^1.4.0",
+        "apollo-server-core": "^2.9.12",
         "graphql": "^14.5.8"
     }
 }

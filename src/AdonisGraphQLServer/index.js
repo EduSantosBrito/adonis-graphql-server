@@ -8,52 +8,68 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL }) {
+    constructor({ Config, runHttpQuery, GraphiQL, qs }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
+        this.qs = qs;
     }
 
-    async graphql(options, request, response) {
-        if (!options) {
+    async getBodyData(request) {
+        if (request.method === 'POST') {
+            let body = '';
+
+            request.on('data', data => {
+                body += data;
+            });
+
+            request.on('end', () => {
+                const post = this.qs.parse(body);
+                console.log(post);
+            });
+        }
+    }
+
+    async graphql({ req, res }) {
+        if (!this.options) {
             throw new Error('Apollo Server requires options.');
         }
-
+        await this.getBodyData();
         try {
-            const gqlResponse = await this.runHttpQuery([request], {
-                method: request.method(),
-                options,
-                query: request.method() === 'POST' ? request.post() : request.get(),
+            const gqlResponse = await this.runHttpQuery([req], {
+                method: req.method,
+                options: this.options,
+                query: req.method === 'POST' ? req.post() : req.get(),
             });
-            return response.json(gqlResponse);
+            return res.json(gqlResponse);
         } catch (error) {
             if (error.name !== 'HttpQueryError') {
                 throw error;
             }
             if (error.headers) {
                 Object.keys(error.headers).forEach(header => {
-                    response.header(header, error.headers[header]);
+                    res.header(header, error.headers[header]);
                 });
             }
-            return response.statusCode(error.statusCode).send(error.message);
+            return res.statusCode(error.statusCode).send(error.message);
         }
     }
 
-    async graphiql(options, request, response) {
-        if (!options) {
-            throw new Error('Apollo Server GraphiQL requires options.');
-        }
+    // async graphiql(options, request, response) {
+    //     if (!options) {
+    //         throw new Error('Apollo Server GraphiQL requires options.');
+    //     }
 
-        const query = request.originalUrl();
+    //     const query = request.originalUrl();
 
-        try {
-            const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
-            return response.header('Content-Type', 'text/html').send(graphiqlString);
-        } catch (error) {
-            return response.send(error);
-        }
-    }
+    //     try {
+    //         const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
+    //         return response.header('Content-Type', 'text/html').send(graphiqlString);
+    //     } catch (error) {
+    //         return response.send(error);
+    //     }
+    // }
 }
 
 module.exports = AdonisGraphQLServer;

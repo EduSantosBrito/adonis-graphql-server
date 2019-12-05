@@ -20,7 +20,7 @@
   </a>
 </p>
 
-> AdonisJS Provider to use Mongodb
+> AdonisJS Provider to use GraphQL
 
 ### 🏠 [Homepage](https://github.com/EduSantosBrito/adonis-graphql-server#readme)
 
