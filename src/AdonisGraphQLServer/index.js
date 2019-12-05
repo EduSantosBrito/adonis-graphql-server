@@ -46,17 +46,10 @@ class AdonisGraphQLServer {
         }
     }
 
-    async graphiql({ request, response }) {
-        const { typeDefs, resolvers, context, ...options } = this.options;
-        if (!this.options || !typeDefs || !resolvers) {
-            throw new Error('Apollo Server requires options.');
-        }
+    async graphiql({ response }) {
+        const { endpoint } = this.options;
         try {
-            const graphqlOptions = {
-                schema: this.makeExecutableSchema({ typeDefs, resolvers }),
-                context: typeof context === 'function' ? context(request) : context,
-                ...options,
-            };
+            const graphqlOptions = { endpoint: endpoint || '/graphql' };
             const playground = this.GraphiQL.renderPlaygroundPage(graphqlOptions);
             return response.header('Content-Type', 'text/html').send(playground);
         } catch (error) {
