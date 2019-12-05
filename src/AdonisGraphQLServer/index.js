@@ -46,20 +46,28 @@ class AdonisGraphQLServer {
         }
     }
 
-    // async graphiql({ request, response }) {
-    //     if (!this.options) {
-    //         throw new Error('Apollo Server GraphiQL requires options.');
-    //     }
-
-    //     const query = request.originalUrl();
-
-    //     try {
-    //         const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, this.options, request);
-    //         return response.header('Content-Type', 'text/html').send(graphiqlString);
-    //     } catch (error) {
-    //         return response.send(error);
-    //     }
-    // }
+    async graphiql({ request, response }) {
+        const { typeDefs, resolvers, context, ...options } = this.options;
+        if (!this.options || !typeDefs || !resolvers) {
+            throw new Error('Apollo Server requires options.');
+        }
+        try {
+            const graphqlOptions = {
+                schema: this.makeExecutableSchema({ typeDefs, resolvers }),
+                context: typeof context === 'function' ? context(request) : context,
+                ...options,
+            };
+            const playground = this.GraphiQL.renderPlaygroundPage(graphqlOptions);
+            return response.header('Content-Type', 'text/html').send(playground);
+        } catch (error) {
+            if (error.headers) {
+                Object.keys(error.headers).forEach(header => {
+                    response.header(header, error.headers[header]);
+                });
+            }
+            return response.status(error.statusCode).send(error.message);
+        }
+    }
 }
 
 module.exports = AdonisGraphQLServer;
