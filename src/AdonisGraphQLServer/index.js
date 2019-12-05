@@ -17,14 +17,18 @@ class AdonisGraphQLServer {
     }
 
     async graphql({ request, response }) {
-        const { typeDefs, resolvers, ...options } = this.options;
+        const { typeDefs, resolvers, context, ...options } = this.options;
         if (!this.options || !typeDefs || !resolvers) {
             throw new Error('Apollo Server requires options.');
         }
         try {
             const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),
-                options: { schema: this.makeExecutableSchema({ typeDefs, resolvers }), ...options },
+                options: {
+                    schema: this.makeExecutableSchema({ typeDefs, resolvers }),
+                    context: typeof context === 'function' ? context(request) : context,
+                    ...options,
+                },
                 query: request.method() === 'POST' ? request.post() : request.get(),
             });
             response.safeHeader('Content-type', 'application/json');
