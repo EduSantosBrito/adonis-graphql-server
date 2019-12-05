@@ -46,15 +46,15 @@ class AdonisGraphQLServer {
         }
     }
 
-    async graphiql(options, request, response) {
-        if (!options) {
+    async graphiql({ request, response }) {
+        if (!this.options) {
             throw new Error('Apollo Server GraphiQL requires options.');
         }
 
         const query = request.originalUrl();
 
         try {
-            const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, options, request);
+            const graphiqlString = await this.GraphiQL.resolveGraphiQLString(query, this.options, request);
             return response.header('Content-Type', 'text/html').send(graphiqlString);
         } catch (error) {
             return response.send(error);
