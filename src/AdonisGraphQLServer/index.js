@@ -8,12 +8,11 @@
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL, jsonBody }) {
+    constructor({ Config, runHttpQuery, GraphiQL }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
-        this.jsonBody = jsonBody;
     }
 
     async graphql({ request, response }) {
