@@ -16,29 +16,27 @@ class AdonisGraphQLServer {
         this.jsonBody = jsonBody;
     }
 
-    async graphql({ req, res }) {
+    async graphql({ request, response }) {
         if (!this.options) {
             throw new Error('Apollo Server requires options.');
         }
-        const body = await this.jsonBody(req, res);
-        console.log(body);
         try {
-            const gqlResponse = await this.runHttpQuery([req], {
-                method: req.method,
+            const gqlResponse = await this.runHttpQuery([request], {
+                method: request.method(),
                 options: this.options,
-                query: req.method === 'POST' ? req.post() : req.get(),
+                query: request.method() === 'POST' ? request.post() : request.get(),
             });
-            return res.json(gqlResponse);
+            return response.json(gqlResponse);
         } catch (error) {
             if (error.name !== 'HttpQueryError') {
                 throw error;
             }
             if (error.headers) {
                 Object.keys(error.headers).forEach(header => {
-                    res.header(header, error.headers[header]);
+                    response.header(header, error.headers[header]);
                 });
             }
-            return res.statusCode(error.statusCode).send(error.message);
+            return response.statusCode(error.statusCode).send(error.message);
         }
     }
 
