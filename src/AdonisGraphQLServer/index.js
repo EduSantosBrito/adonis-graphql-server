@@ -17,7 +17,7 @@ class AdonisGraphQLServer {
     }
 
     async graphql({ request, response }) {
-        const { typeDefs, resolvers, context, ...options } = this.options;
+        const { typeDefs, resolvers, context, endpoint, ...options } = this.options;
         if (!this.options || !typeDefs || !resolvers) {
             throw new Error('Apollo Server requires options.');
         }
