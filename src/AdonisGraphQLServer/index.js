@@ -35,17 +35,28 @@ class AdonisGraphQLServer {
         return { query: this.print(query) };
     }
 
+    _getSchemaValues() {
+        const { typeDefs, resolvers, schemaDirectives } = this.options;
+        if (!typeDefs || !resolvers) {
+            throw new Error('typeDefs and resolvers are required');
+        }
+        if (schemaDirectives) {
+            return { typeDefs, resolvers, schemaDirectives };
+        }
+        return { typeDefs, resolvers };
+    }
+
     async graphql({ request, response }) {
         const { typeDefs, resolvers, context, endpoint, ...options } = this.options;
-        if (!this.options || !typeDefs || !resolvers) {
-            throw new Error('Apollo Server requires options.');
+        if (!this.options) {
+            throw new Error('Options is required.');
         }
         const { query, variables } = request.method() === 'POST' ? request.post() : request.get();
         try {
             const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),
                 options: {
-                    schema: this.makeExecutableSchema({ typeDefs, resolvers }),
+                    schema: this.makeExecutableSchema(this._getSchemaValues()),
                     context: typeof context === 'function' ? context(request) : context,
                     ...options,
                 },
