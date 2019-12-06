@@ -1,3 +1,7 @@
+function isString(value) {
+    return Object.prototype.toString.call(value) === '[object String]';
+}
+
 /**
  * adonis-graphql-server is a provider that gives you power to use GraphQL whitout limitation
  *
@@ -17,6 +21,20 @@ class AdonisGraphQLServer {
         this.print = print;
     }
 
+    _getQueryObject(body) {
+        const { query, variables } = body;
+        if (variables) {
+            if (isString(query)) {
+                return { query, variables };
+            }
+            return { query: this.print(query), variables };
+        }
+        if (isString(query)) {
+            return { query };
+        }
+        return { query: this.print(query) };
+    }
+
     async graphql({ request, response }) {
         const { typeDefs, resolvers, context, endpoint, ...options } = this.options;
         if (!this.options || !typeDefs || !resolvers) {
@@ -31,7 +49,7 @@ class AdonisGraphQLServer {
                     context: typeof context === 'function' ? context(request) : context,
                     ...options,
                 },
-                query: variables ? { query: this.print(query), variables } : { query },
+                query: this._getQueryObject({ query, variables }),
             });
             response.safeHeader('Content-type', 'application/json');
             return response.json(graphqlResponse);
