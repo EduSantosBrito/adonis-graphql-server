@@ -12,13 +12,15 @@ function isString(value) {
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print }) {
+    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print, GraphQLUpload, gql }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
         this.GraphiQL = GraphiQL;
         this.makeExecutableSchema = makeExecutableSchema;
         this.print = print;
+        this.GraphQLUpload = GraphQLUpload;
+        this.gql = gql;
     }
 
     _getQueryObject(body) {
@@ -35,15 +37,28 @@ class AdonisGraphQLServer {
         return { query: this.print(query) };
     }
 
+    _insertUploadType(typeDefs, resolvers) {
+        const typeDefsWithUpload = this.gql`
+            ${typeDefs}
+            scalar Upload
+        `;
+        const resolversWithUpload = {
+            ...resolvers,
+            Upload: this.GraphQLUpload,
+        };
+        return { typeDefsWithUpload, resolversWithUpload };
+    }
+
     _getSchemaValues() {
         const { typeDefs, resolvers, schemaDirectives } = this.options;
         if (!typeDefs || !resolvers) {
             throw new Error('typeDefs and resolvers are required');
         }
+        const { typeDefsWithUpload, resolversWithUpload } = this._insertUploadType(typeDefs, resolvers);
         if (schemaDirectives) {
-            return { typeDefs, resolvers, schemaDirectives };
+            return { typeDefs: typeDefsWithUpload, resolvers: resolversWithUpload, schemaDirectives };
         }
-        return { typeDefs, resolvers };
+        return { typeDefs: typeDefsWithUpload, resolvers: resolversWithUpload };
     }
 
     async graphql({ request, response }) {
