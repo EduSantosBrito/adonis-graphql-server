@@ -8,7 +8,7 @@ class AdonisGraphQLServerProvider extends ServiceProvider {
             const GraphiQL = this.app.use('graphql-playground-html');
             const { makeExecutableSchema } = this.app.use('graphql-tools');
             const { print } = this.app.use('graphql/language/printer');
-            const { GraphQLUpload } = this.app.use('graphql-upload');
+            const { GraphQLUpload, processRequest } = this.app.use('graphql-upload');
 
             return new (require('../src/AdonisGraphQLServer'))({
                 Config,
@@ -18,6 +18,7 @@ class AdonisGraphQLServerProvider extends ServiceProvider {
                 print,
                 GraphQLUpload,
                 gql,
+                processRequest,
             });
         });
     }

@@ -12,7 +12,7 @@ function isString(value) {
  * @class AdonisGraphQLServer
  */
 class AdonisGraphQLServer {
-    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print, GraphQLUpload, gql }) {
+    constructor({ Config, runHttpQuery, GraphiQL, makeExecutableSchema, print, GraphQLUpload, gql, processRequest }) {
         this.Config = Config;
         this.options = this.Config.get('graphql');
         this.runHttpQuery = runHttpQuery;
@@ -21,6 +21,7 @@ class AdonisGraphQLServer {
         this.print = print;
         this.GraphQLUpload = GraphQLUpload;
         this.gql = gql;
+        this.processRequest = processRequest;
     }
 
     _getQueryObject(body) {
@@ -61,12 +62,26 @@ class AdonisGraphQLServer {
         return { typeDefs: typeDefsWithUpload, resolvers: resolversWithUpload };
     }
 
+    _isRequestJSON(request) {
+        return request.is(['application/json']) === 'application/json';
+    }
+
+    async _getRequestData(request, response) {
+        if (this._isRequestJSON(request)) {
+            return request.method() === 'POST' ? request.post() : request.get();
+        }
+        if (this.Config.get('bodyParser.files.autoProcess')) {
+            throw new Error('You need to disable autoProcess flag in config/bodyParser.js to use form-data');
+        }
+        return this.processRequest(request.request, response.response);
+    }
+
     async graphql({ request, response }) {
         const { typeDefs, resolvers, context, endpoint, ...options } = this.options;
         if (!this.options) {
             throw new Error('Options is required.');
         }
-        const { query, variables } = request.method() === 'POST' ? request.post() : request.get();
+        const { query, variables } = await this._getRequestData(request, response);
         try {
             const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),

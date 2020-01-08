@@ -121,4 +121,6 @@ Route.get('/graphiql', context => {
 });
 ```
 
+> If you want to upload files, you **have** to disable `autoProcess` flag in config/bodyParser.js
+
 And **that's it**! Now you're free to use GraphQL Server.
