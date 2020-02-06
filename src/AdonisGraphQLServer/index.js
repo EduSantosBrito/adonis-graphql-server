@@ -24,6 +24,45 @@ class AdonisGraphQLServer {
         this.processRequest = processRequest;
     }
 
+    _isObject(obj = {}) {
+        return !!obj && !Array.isArray(obj) && Object.entries(obj).length && typeof obj === 'object';
+    }
+
+    _sanitizeObject(obj) {
+        let tmpValues = [];
+        const retorno = Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => {
+                if (/.*\[\d+\]/.test(key)) {
+                    tmpValues = [...tmpValues, value];
+                    return [key.split('[')[0], tmpValues];
+                }
+                return [key, value];
+            }),
+        );
+        return retorno;
+    }
+
+    _checkIfHasBrackets(obj) {
+        const filtered = Object.entries(obj).find(([key]) => /.*\[\d+\]/.test(key));
+        return !!filtered;
+    }
+
+    _deepLookObject(obj, checker, callback) {
+        if (obj && !!checker(obj)) {
+            return callback(obj);
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map(value => this._deepLookObject(value, checker, callback));
+        }
+
+        if (this._isObject(obj)) {
+            return Object.fromEntries(Object.entries(obj).map(([key, value]) => [key, this._deepLookObject(value, checker, callback)]));
+        }
+
+        return obj;
+    }
+
     _getQueryObject(body) {
         const { query, variables } = body;
         if (variables) {
@@ -82,6 +121,9 @@ class AdonisGraphQLServer {
             throw new Error('Options is required.');
         }
         const { query, variables } = await this._getRequestData(request, response);
+
+        const transformedVariables = this._deepLookObject(variables, this._checkIfHasBrackets, this._sanitizeObject);
+
         try {
             const { graphqlResponse } = await this.runHttpQuery([request], {
                 method: request.method(),
@@ -90,7 +132,7 @@ class AdonisGraphQLServer {
                     context: typeof context === 'function' ? context(request) : context,
                     ...options,
                 },
-                query: this._getQueryObject({ query, variables }),
+                query: this._getQueryObject({ query, variables: transformedVariables }),
             });
             response.safeHeader('Content-type', 'application/json');
             return response.json(graphqlResponse);
